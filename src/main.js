@@ -16,13 +16,33 @@ Vue.use(VueCookies)
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 axios.defaults.baseURL = 'http://localhost:8000/api'
-const token=localStorage.getItem('Authorization')
-if(token){
-  Vue.prototype.$http.defaults.headers.common['Authorization'] = token
-}
 
 new Vue({
   router,
   store,
+  methods: {
+    isAuthenticate : function(){
+      if(localStorage.getItem("Authorization")){
+        let conf = { headers : {"Authorization" : "Bearer " + localStorage.getItem("Authorization")} };
+        this.axios.get("/login/check", conf)
+        .then(response => {
+          if(response.data.success == false){
+            this.$store.commit('logout')
+            //this.$router.push('dashboard')
+          } else {
+            this.$store.commit('userDetail', response.data.data.user)
+          }
+        })
+        .catch(error => {
+          this.$store.commit('logout')
+        });
+      } else {
+        this.$store.commit('logout')
+      }
+    },
+  },
+  mounted(){
+    this.isAuthenticate()
+  },
   render: h => h(App)
 }).$mount('#app')

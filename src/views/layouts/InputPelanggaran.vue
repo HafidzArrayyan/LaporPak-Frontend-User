@@ -1,131 +1,265 @@
-<template lang="html">
-  <div class="container-fluid page-body-wrapper">
-    <div class="main-panel">
-      <div class="content-wrapper">
-        <div class="row">
-          <div class="col-lg-12 grid-margin stretch-card">
-            <div class="card">
-              <div class="card-body">
-                <p class="card-title float-left"><b>Input Poin Siswa</b></p>
-                <p class="card-description float-right">
-                  <a href="#" class="btn btn-sm btn-success btn-icon-text" data-toggle="modal" data-target="#modalDetail">
-                    <i class="mdi mdi-plus btn-icon-prepend"></i>
-                    Input Poin
-                  </a>
-                </p>
-                <div class="table-responsive">
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>Tanggal</th>
-                        <th>Nama Siswa</th>
-                        <th>Kelas</th>
-                        <th>Kategori</th>
-                        <th>Pelanggaran</th>
-                        <th>Poin</th>
-                        <th>Aksi</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>10/12/2019</td>
-                        <td>Herman Beck Supriadi</td>
-                        <td>X RPL 2</td>
-                        <td>Kedisiplinan</td>
-                        <td>Terlambat masuk sekolah</td>
-                        <td><div class="badge badge-primary">15</div></td>
-                        <td>
-                          <a href="#" class="btn btn-sm btn-danger btn-icon-text" data-toggle="modal" data-target="#modalDetail">
-                            <i class="mdi mdi-delete btn-icon-prepend"></i>
-                            Hapus
-                          </a>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>01/12/2019</td>
-                        <td>John Abraham Sutanto</td>
-                        <td>XII TKJ 4</td>
-                        <td>Kerapian</td>
-                        <td>Seragam tidak sesuai ketentuan</td>
-                        <td><div class="badge badge-primary">10</div></td>
-                        <td>
-                          <a href="#" class="btn btn-sm btn-danger btn-icon-text" data-toggle="modal" data-target="#modalDetail">
-                            <i class="mdi mdi-delete btn-icon-prepend"></i>
-                            Hapus
-                          </a>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+<template>
+  <div>
+    <div class="container mt-3">
+      <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+          <div class="card">
+            <div class="card-body">
+              <p class="card-title float-left"><b>Data Input Pelanggaran Tatib</b></p>
+              <p class="card-description float-right">
+                <b-button variant="success" v-b-modal.modalInput v-on:click="Add"><i class="mdi mdi-plus btn-icon-prepend"></i> Tambah</b-button>
+              </p>
+              <div class="table-responsive">
+
+                <b-table striped hover :items="data_pelanggaran" :fields="fields">
+                  <template v-slot:cell(poin)="data">
+                    <h5><b-badge variant="warning">{{ data.item.poin }}</b-badge></h5>
+                  </template>
+                  <template v-slot:cell(Aksi)="data">
+                    <b-button size="sm" variant="info" v-on:click="Edit(data.item)" v-b-modal.modalInput><i class="mdi mdi-pencil btn-icon-prepend"></i> Ubah</b-button>&nbsp;
+                    <b-button size="sm" variant="danger" v-on:click="Drop(data.item.id)"><i class="mdi mdi-delete btn-icon-prepend"></i> Hapus</b-button>
+                  </template>
+                </b-table>
+                <b-pagination
+                  v-model="currentPage"
+                  :per-page="perPage"
+                  :total-rows="rows"
+                  align="center"
+                  v-on:input="pagination">
+                </b-pagination>
+
+                <b-toast id="loadingToast" title="Processing Data" no-auto-hide>
+                  <b-spinner label="Spinning" variant="success"></b-spinner>
+                  <strong class="text-success">Loading...</strong>
+                </b-toast>
+
+                <!-- toast untuk tampilan message box -->
+                <b-toast id="message" title="Message">
+                  <strong class="text-success">{{ message }}</strong>
+                </b-toast>
+
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content modal-md">
-            <div class="modal-header">
-              <h5 class="modal-title" id="ModalLabel">Input Poin Siswa</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="form-group">
-                  <label for="id_siswa" class="col-form-label">Nama Siswa</label>
-                  <select class="form-control" name="id_siswa" id="id_siswa">
-                    <option value="1" checked>Herman Beck Supriadi</option>
-                    <option value="2">John Abraham Sutanto</option>
-                    <option value="3">Nateila Ayu Rahmawati</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="id_pelanggaran" class="col-form-label">Pelanggaran</label>
-                  <select class="form-control" name="id_pelanggaran" id="id_pelanggaran">
-                    <option value="1" checked>Terlambat masuk sekolah</option>
-                    <option value="2">Barang tertinggal</option>
-                    <option value="3">Seragam tidak sesuai ketentuan</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="keterangan" class="col-form-label">Keterangan</label>
-                  <input type="text" name="keterangan" class="form-control" id="keterangan" placeholder="Keterangan">
-                </div>
-                <div class="form-group">
-                  <button type="button" class="btn btn-md btn-success">Simpan</button>
-                  <button type="button" class="btn btn-md btn-light" data-dismiss="modal">Batal</button>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- content-wrapper ends -->
-      <!-- partial:partials/_footer.html -->
-      <footer class="footer">
-        <div class="w-100 clearfix">
-          <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2019 <a href="http://www.urbanui.com/" target="_blank">Moklet</a>. All rights reserved.</span>
-          <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">UKL Moklet & Made With <i class="mdi mdi-heart-outline text-danger"></i></span>
-        </div>
-      </footer>
-      <!-- partial -->
     </div>
-    <!-- main-panel ends -->
+
+    <b-modal
+      id="modalInput"
+      @ok="Save"
+    >
+      <template v-slot:modal-title>
+        Form Input Pelanggaran
+      </template>
+        <form ref="form">
+          <div class="form-group">
+              <label for="tanggal" class="col-form-label">Tgl.Melanggar</label>
+              <b-form-input type="date" v-model="tanggal"></b-form-input>
+          </div>
+          <div class="form-group">
+            <label for="nama_siswa" class="col-form-label">Nama Siswa</label>
+            <b-form-select id="id" v-model="id_siswa" :options="nama_siswa"></b-form-select>
+          </div>
+          <div class="form-group">
+            <label for="id_pelanggaran" class="col-form-label">Pelanggaran</label>
+            <b-form-select id="id_pelanggaran" v-model="id_pelanggaran" :options="nama_pelanggaran"></b-form-select>
+          </div>
+          <div class="form-group">
+            <label for="keterangan" class="col-form-label">Keterangan</label>
+            <b-form-input type="text" v-model="keterangan" placeholder="Keterangan"></b-form-input>
+          </div>
+        </form>
+    </b-modal>
+
   </div>
 </template>
-
 <script>
-export default {
+module.exports = {
+  data : function(){
+    return {
+      search: "",
+      id: "",
+      id_petugas: "",
+      id_siswa: "",
+      id_pelanggaran: "",
+      keterangan: "",
+      tanggal: "",
+      action: "",
+      message: "",
+      currentPage: 1,
+      rows: 0,
+      perPage: 10,
+      key: "",
+      data_pelanggaran: [],
+      fields: ["tanggal", "nama_siswa", "kelas", "kategori", "nama_pelanggaran", "poin", "Aksi"],
+      nama_siswa: [],
+      nama_pelanggaran: []
+    }
+  },
+
+  methods: {
+    getData : function(){
+      let conf = { headers: { "Authorization" : 'Bearer ' + this.key } };
+      let offset = (this.currentPage - 1) * this.perPage;
+      this.$bvToast.show("loadingToast");
+      this.axios.get("/poin", conf)
+      .then(response => {
+        if(response.data.status == 1){
+          this.$bvToast.hide("loadingToast");
+          this.data_pelanggaran = response.data.poin;
+          this.rows = response.data.count;
+        } else {
+          this.$bvToast.hide("loadingToast");
+          this.message = "Gagal menampilkan data poin pelanggaran semua siswa."
+          this.$bvToast.show("message");
+          this.$router.push({name: "login"})
+        }
+
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    },
+
+    getSiswaDropdown: function(){
+        //ambil data siswa untuk dropdown
+        let conf = { headers: { "Authorization" : 'Bearer ' + this.key } };
+        this.axios.get("/siswa", conf)
+        .then(response => {
+            let json_siswa = response.data.siswa;
+            let list_siswa = []
+            json_siswa.forEach(element => {
+                list_siswa.push({value: element.id, text: element.nama_siswa})
+            });
+            this.nama_siswa = list_siswa
+        })
+    },
+
+    getPelanggaranDropdown: function(){
+        //ambil data pelanggaran untuk dropdown
+        let conf = { headers: { "Authorization" : 'Bearer ' + this.key } };
+        this.axios.get("/pelanggaran", conf)
+        .then(response => {
+            let json_pelanggaran = response.data.pelanggaran;
+            let list_pelanggaran = []
+            json_pelanggaran.forEach(element => {
+                list_pelanggaran.push({value: element.id, text: element.nama_pelanggaran})
+            });
+            this.nama_pelanggaran = list_pelanggaran
+        })
+    },
+
+    pagination : function(){
+      if(this.search == ""){
+        this.getData();
+      } else {
+        this.searching();
+      }
+    },
+
+    Add : function(){
+      this.action = "insert"
+      this.id = ""
+      this.id_petugas = this.$store.getters.userDetail.id
+      this.id_siswa = ""
+      this.id_pelanggaran = ""
+      this.keterangan = ""
+      this.tanggal = ""
+      this.getSiswaDropdown()
+      this.getPelanggaranDropdown()
+    },
+
+    Edit : function(item){
+      this.getSiswaDropdown()
+      this.getPelanggaranDropdown()
+      this.action = "update";
+      this.id = item.id
+      this.id_petugas = this.$store.getters.userDetail.id
+      this.id_siswa = item.id_siswa;
+      this.id_pelanggaran = item.id_pelanggaran;
+      this.keterangan = item.keterangan;
+      this.tanggal = item.tanggal
+    },
+
+    Save : function(){
+      let conf = { headers: { "Authorization" : 'Bearer ' + this.key } };
+      this.$bvToast.show("loadingToast");
+
+      if(this.action === "insert"){
+        let form = new FormData();
+        //get id petugas
+        this.axios.get("/login/check", conf)
+        .then(response => {
+          if(response.data.auth == false || response.data.status == 0){
+            this.$store.commit('logout')
+          }
+        })
+
+        form.append("id_petugas", this.id_petugas);
+        form.append("id_siswa", this.id_siswa);
+        form.append("id_pelanggaran", this.id_pelanggaran);
+        form.append("keterangan", this.keterangan);
+        form.append("tanggal", this.tanggal);
+        this.axios.post("/poin", form, conf)
+        .then(response => {
+          this.$bvToast.hide("loadingToast");
+          if(this.search == ""){
+            this.getData();
+          } else {
+            this.searching();
+          }
+          this.message = response.data.message;
+          this.$bvToast.show("message");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      } else {
+        let form = {
+          id_petugas: this.id_petugas,
+          id_pelanggaran: this.id_pelanggaran,
+          id_siswa: this.id_siswa,
+          keterangan: this.keterangan,
+          tanggal: this.tanggal
+        }
+        this.axios.put("/poin/" + this.id, form, conf)
+        .then(response => {
+          this.$bvToast.hide("loadingToast");
+          if(this.search == ""){
+            this.getData();
+          } else {
+            this.searching();
+          }
+          this.message = response.data.message;
+          this.$bvToast.show("message");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+    },
+
+    Drop : function(id){
+      let conf = { headers: { "Authorization" : "Bearer " + this.key} };
+      if(confirm('Apakah anda yakin ingin menghapus data ini?')){
+        this.$bvToast.show("loadingToast");
+        this.axios.delete("/poin/" + id, conf)
+        .then(response => {
+            this.getData();
+            this.$bvToast.hide("loadingToast");
+            this.message = response.data.message;
+            this.$bvToast.show("message");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+    },
+  },
+  mounted(){
+    this.key = localStorage.getItem("Authorization");
+    this.getData();
+  }
 }
 </script>
-
-<style lang="css" scoped>
-</style>

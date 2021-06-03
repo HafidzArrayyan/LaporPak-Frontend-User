@@ -56,9 +56,9 @@
                 <div class="row">
                   <div class="col-md-6 col-lg-6 grid-margin stretch-card">
                     <div class="card bg-gradient-primary text-white text-center card-shadow-primary">
-                      <div class="card-body">
+                      <div class="card-body" :items="beranda">
                         <h6 class="font-weight-normal">Data Siswa</h6>
-                        <h2 class="mb-0">1450</h2>
+                        <h2 class="mb-0"></h2>
                       </div>
                     </div>
                   </div>
@@ -133,8 +133,8 @@
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="w-100 clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2019 <a href="http://www.urbanui.com/" target="_blank">Moklet</a>. All rights reserved.</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">UKL Moklet & Made With <i class="mdi mdi-heart-outline text-danger"></i></span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © 2021 </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Layanan Pengaduan Masyarakat & Made With <i class="mdi mdi-heart-outline text-danger"></i></span>
             </div>
           </footer>
           <!-- partial -->
@@ -147,8 +147,25 @@
 </template>
 
 <script>
-
 export default {
-  name: 'home'
+    name: 'home',
+    computed : {
+        isLoggedIn : function(){ return this.$store.getters.isLoggedIn}
+    },
+    methods:{
+      logout:function(){
+          let conf = { headers : {"Authorization" : "Bearer " + localStorage.getItem("Authorization")} };
+          let form = new FormData();
+          this.axios.post('/logout', form, conf).then(response => {
+            if (response.data.logged === false || response.data.status === 0) {
+                this.$store.commit('logout')
+                localStorage.removeItem("Authorization")
+                this.$router.push({name: 'login'})
+            }
+          }).catch(error => {
+
+        });
+      },
+  },
 }
 </script>

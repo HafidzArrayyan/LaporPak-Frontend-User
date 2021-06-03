@@ -2,15 +2,11 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store'
 import Home from '../views/Home.vue'
-import Profile from '../views/Profile.vue'
 import Login from '../views/Login.vue'
-import Navbar from '../views/layouts/Navbar.vue'
+import Register from '../views/layouts/Register.vue'
 import Header from '../views/layouts/Header.vue'
-import petugasTatib from '../views/layouts/PetugasTatib.vue'
-import dataSiswa from '../views/layouts/DataSiswa.vue'
-import dataPelanggaran from '../views/layouts/Pelanggaran.vue'
-import inputPelanggaran from '../views/layouts/InputPelanggaran.vue'
-import poinSiswa from '../views/layouts/PoinSiswa.vue'
+import pengaduanMasy from '../views/layouts/pengaduanMasy.vue'
+import Lapor from '../views/layouts/Lapor.vue'
 import Footer from '../views/layouts/Footer.vue'
 
 Vue.use(VueRouter)
@@ -19,7 +15,12 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    components: {default: Login, header: Navbar, footer: Footer}
+    components: {default: Login, footer: Footer}
+  },
+  {
+    path: '/register',
+    name: 'register',
+    components: {default: Register, footer: Footer}
   },
   {
     path: '/',
@@ -30,51 +31,27 @@ const routes = [
     }
   },
   {
-    path: '/petugasTatib',
-    name: 'petugasTatib',
-    components: {default: petugasTatib, header:Header},
+    path: '/pengaduanMasy',
+    name: 'pengaduanMasy',
+    components: {default: pengaduanMasy, header:Header},
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: '/dataSiswa',
-    name: 'dataSiswa',
-    components: {default: dataSiswa, header:Header},
+    path: '/lapor',
+    name: 'lapor',
+    components: {default: Lapor, header:Header},
     meta: {
       requiresAuth: true
     }
   },
-  {
-    path: '/dataPelanggaran',
-    name: 'dataPelanggaran',
-    components: {default: dataPelanggaran, header:Header},
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/inputPelanggaran',
-    name: 'inputPelanggaran',
-    components: {default: inputPelanggaran, header:Header},
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/poinSiswa',
-    name: 'poinSiswa',
-    components: {default: poinSiswa, header:Header},
-    meta: {
-      requiresAuth: true
-    }
-  }
 ]
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes: routes
+  routes
 })
 
 router.beforeEach((to, from, next) => {

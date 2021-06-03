@@ -5,8 +5,7 @@
   >
     <div class="container">
       <div class="copyright text-center">
-        &copy; {{ year }}, Designed by
-        SMK Telkom Malang
+        &copy; {{ year }}, Layanan Pengaduan Masyarakat
       </div>
     </div>
   </footer>
